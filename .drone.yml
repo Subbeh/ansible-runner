@@ -1,0 +1,31 @@
+---
+
+kind: pipeline
+type: docker
+name: ansible-runner
+
+steps:
+  - name: build and publish
+    image: plugins/docker
+    privileged: true
+    settings:
+      repo: sterwindt/ansible-runner
+      mtu: 1450
+      username: 
+        from_secret: DOCKER_USER
+      password: 
+        from_secret: DOCKER_PASSWORD
+      tags:
+        - latest
+---
+kind: secret
+name: DOCKER_USER
+get:
+  path: drone-doppler-secret
+  name: DOCKER_USER
+---
+kind: secret
+name: DOCKER_PASSWORD
+get:
+  path: drone-doppler-secret
+  name: DOCKER_PASSWORD
