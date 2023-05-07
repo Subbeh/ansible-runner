@@ -17,6 +17,28 @@ steps:
         from_secret: DOCKER_PASSWORD
       tags:
         - latest
+    when:
+      event:
+        - push
+        - pull_request
+
+  - name: build and publish (scheduled)
+    image: plugins/docker
+    privileged: true
+    settings:
+      repo: sterwindt/ansible-runner
+      mtu: 1450
+      pull_image: true
+      no_cache: true
+      username: 
+        from_secret: DOCKER_USER
+      password: 
+        from_secret: DOCKER_PASSWORD
+      tags:
+        - latest
+    when:
+      event:
+      - cron
 ---
 kind: secret
 name: DOCKER_USER
