@@ -54,6 +54,22 @@ steps:
       event:
       - cron
 
+  - name: discord notification
+    image: appleboy/drone-discord
+    settings:
+      username: Drone
+      webhook_id:
+        from_secret: DISCORD_ID
+      webhook_token:
+        from_secret: DISCORD_TOKEN
+      message: >
+        {{#success build.status}}✅{{else}}⚠️{{/success}}
+        repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
+               commit: `{{commit.message}}` 
+    when:
+      status: [ success, failure, changed ]
+      event: [ push ]
+
 volumes:
   - name: cache
     host:
@@ -71,8 +87,25 @@ get:
   name: GITEA_USER
 
 ---
+
 kind: secret
 name: GITEA_PASSWORD
 get:
   path: drone-doppler-secret
   name: GITEA_PASSWORD
+
+---
+
+kind: secret
+name: DISCORD_ID
+get:
+  path: drone-doppler-secret
+  name: DISCORD_ID
+
+---
+
+kind: secret
+name: DISCORD_TOKEN
+get:
+  path: drone-doppler-secret
+  name: DISCORD_TOKEN
