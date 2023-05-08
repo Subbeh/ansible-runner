@@ -1,0 +1,3 @@
+docker build -t ansible-runner .
+docker tag ansible-runner git.sbbh.cloud/sysadm/ansible-runner:latest
+docker push git.sbbh.cloud/sysadm/ansible-runner:latest
