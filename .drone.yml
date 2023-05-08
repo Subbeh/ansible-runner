@@ -9,12 +9,13 @@ steps:
     image: plugins/docker
     privileged: true
     settings:
-      repo: sterwindt/ansible-runner
+      repo: sysadm/ansible-runner
+      registry: git.sbbh.cloud
       mtu: 1450
       username: 
-        from_secret: DOCKER_USER
+        from_secret: GITEA_USER
       password: 
-        from_secret: DOCKER_PASSWORD
+        from_secret: GITEA_PASSWORD
       tags:
         - latest
     when:
@@ -26,14 +27,15 @@ steps:
     image: plugins/docker
     privileged: true
     settings:
-      repo: sterwindt/ansible-runner
+      repo: sysadm/ansible-runner
+      registry: git.sbbh.cloud
       mtu: 1450
       pull_image: true
       no_cache: true
       username: 
-        from_secret: DOCKER_USER
+        from_secret: GITEA_USER
       password: 
-        from_secret: DOCKER_PASSWORD
+        from_secret: GITEA_PASSWORD
       tags:
         - latest
     when:
@@ -51,3 +53,15 @@ name: DOCKER_PASSWORD
 get:
   path: drone-doppler-secret
   name: DOCKER_PASSWORD
+---
+kind: secret
+name: GITEA_USER
+get:
+  path: drone-doppler-secret
+  name: GITEA_USER
+---
+kind: secret
+name: GITEA_PASSWORD
+get:
+  path: drone-doppler-secret
+  name: GITEA_PASSWORD
