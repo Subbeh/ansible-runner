@@ -9,7 +9,7 @@ steps:
     image: plugins/docker
     privileged: true
     settings:
-      repo: sysadm/ansible-runner
+      repo: git.sbbh.cloud/sysadm/ansible-runner
       registry: git.sbbh.cloud
       mtu: 1450
       username: 
