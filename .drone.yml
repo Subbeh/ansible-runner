@@ -4,7 +4,22 @@ kind: pipeline
 type: docker
 name: ansible-runner
 
+globals:
+  - &docker_creds
+    username:
+      from_secret: GITEA_USER
+    password:
+      from_secret: GITEA_PASSWORD
+
 steps:
+  - name: prepare-cache
+    image: busybox
+    commands:
+      - mkdir -p /cache/${DRONE_REPO}/docker
+    volumes:
+      - name: cache
+        path: /cache
+
   - name: build and publish
     image: plugins/docker
     privileged: true
@@ -12,12 +27,12 @@ steps:
       repo: git.sbbh.cloud/sysadm/ansible-runner
       registry: git.sbbh.cloud
       mtu: 1450
-      username: 
-        from_secret: GITEA_USER
-      password: 
-        from_secret: GITEA_PASSWORD
+      <<: *docker_creds
       tags:
         - latest
+    volumes:
+      - name: docker
+        path: /var/lib/docker       
     when:
       event:
         - push
@@ -27,38 +42,34 @@ steps:
     image: plugins/docker
     privileged: true
     settings:
-      repo: sysadm/ansible-runner
+      repo: git.sbbh.cloud/sysadm/ansible-runner
       registry: git.sbbh.cloud
       mtu: 1450
       pull_image: true
       no_cache: true
-      username: 
-        from_secret: GITEA_USER
-      password: 
-        from_secret: GITEA_PASSWORD
+      <<: *docker_creds
       tags:
         - latest
     when:
       event:
       - cron
+
+volumes:
+  - name: cache
+    host:
+      path: /var/cache
+  - name: docker
+    host:
+      path: /var/cache/${DRONE_REPO}/docker
+
 ---
-kind: secret
-name: DOCKER_USER
-get:
-  path: drone-doppler-secret
-  name: DOCKER_USER
----
-kind: secret
-name: DOCKER_PASSWORD
-get:
-  path: drone-doppler-secret
-  name: DOCKER_PASSWORD
----
+
 kind: secret
 name: GITEA_USER
 get:
   path: drone-doppler-secret
   name: GITEA_USER
+
 ---
 kind: secret
 name: GITEA_PASSWORD
