@@ -22,10 +22,6 @@ RUN pip3 install --upgrade pip
 # Install Ansible via pip.
 RUN pip3 install $pip_packages
 
-# Install yq
-RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq &&\
-    chmod +x /usr/bin/yq
-
 COPY initctl_faker .
 RUN chmod +x initctl_faker && rm -fr /sbin/initctl && ln -s /initctl_faker /sbin/initctl
 
