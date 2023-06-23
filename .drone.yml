@@ -83,7 +83,7 @@ volumes:
 kind: secret
 name: GITEA_USER
 get:
-  path: drone-doppler-secret
+  path: doppler-drone
   name: GITEA_USER
 
 ---
@@ -91,7 +91,7 @@ get:
 kind: secret
 name: GITEA_PASSWORD
 get:
-  path: drone-doppler-secret
+  path: doppler-drone
   name: GITEA_PASSWORD
 
 ---
@@ -99,7 +99,7 @@ get:
 kind: secret
 name: DISCORD_ID
 get:
-  path: drone-doppler-secret
+  path: doppler-drone
   name: DISCORD_ID
 
 ---
@@ -107,5 +107,5 @@ get:
 kind: secret
 name: DISCORD_TOKEN
 get:
-  path: drone-doppler-secret
+  path: doppler-drone
   name: DISCORD_TOKEN

@@ -2,7 +2,7 @@ FROM debian:bullseye
 
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV pip_packages "ansible ansible-core cryptography ansible-lint molecule"
+ENV pip_packages "ansible ansible-core cryptography ansible-lint molecule netaddr"
 
 # Install dependencies.
 RUN apt-get update \
