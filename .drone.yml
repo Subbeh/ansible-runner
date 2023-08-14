@@ -6,9 +6,9 @@ name: ansible-runner
 globals:
   - &docker_creds
     username:
-      from_secret: GITEA_USER
+      from_secret: GIT_USER
     password:
-      from_secret: GITEA_PASSWORD
+      from_secret: GIT_PASSWORD
 
 steps:
   - name: prepare-cache
@@ -22,14 +22,19 @@ steps:
   - name: build and publish
     image: plugins/docker
     privileged: true
+    environment:
+      GIT_USER:
+        from_secret: GIT_USER
+      GIT_PASSWORD:
+        from_secret: GIT_PASSWORD
     settings:
       <<: *docker_creds
       repo: git.sbbh.cloud/sysadm/ansible-runner
       registry: git.sbbh.cloud
       mtu: 1450
-      build_args:
-        - GIT_USERNAME=${username}
-        - GIT_PASSWORD=${password}
+      build_args_from_env:
+        - GIT_USER
+        - GIT_PASSWORD
       tags:
         - latest
     volumes:
@@ -50,9 +55,6 @@ steps:
       mtu: 1450
       pull_image: true
       no_cache: true
-      build_args:
-        - GIT_USERNAME=${username}
-        - GIT_PASSWORD=${password}
       tags:
         - latest
     when:
@@ -85,14 +87,14 @@ volumes:
 
 ---
 kind: secret
-name: GITEA_USER
+name: GIT_USER
 get:
   path: doppler-drone
   name: GITEA_USER
 
 ---
 kind: secret
-name: GITEA_PASSWORD
+name: GIT_PASSWORD
 get:
   path: doppler-drone
   name: GITEA_PASSWORD
