@@ -1,3 +1,12 @@
-docker build -t ansible-runner .
-docker tag ansible-runner git.sbbh.cloud/sysadm/ansible-runner:latest
-docker push git.sbbh.cloud/sysadm/ansible-runner:latest
+REGISTRY=git.sbbh.cloud
+
+docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD $REGISTRY
+docker buildx build \
+  --build-arg GIT_USERNAME=$DOCKER_USERNAME \
+  --build-arg GIT_PASSWORD=$DOCKER_PASSWORD \
+  --progress=plain \
+  --push \
+  --no-cache=false \
+  --tag git.sbbh.cloud/sysadm/ansible-runner:alpine \
+  --tag git.sbbh.cloud/sysadm/ansible-runner:latest \
+  .

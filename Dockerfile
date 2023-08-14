@@ -1,36 +1,23 @@
-FROM debian:bullseye
+FROM alpine/ansible:latest
 
-ARG DEBIAN_FRONTEND=noninteractive
+ARG GIT_USERNAME
+ARG GIT_PASSWORD
 
-ENV pip_packages "ansible ansible-core cryptography ansible-lint molecule netaddr"
+## install base packages
+RUN apk add build-base git grep curl openssh
 
-# Install dependencies.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-       sudo systemd systemd-sysv \
-       build-essential wget curl libffi-dev libssl-dev procps \
-       python3-pip python3-dev python3-setuptools python3-wheel python3-apt \
-       openssh-client iproute2 \
-       git \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -Rf /usr/share/doc && rm -Rf /usr/share/man \
-    && apt-get clean
+## fetch requirements files
+ADD https://$GIT_USERNAME:$GIT_PASSWORD@git.sbbh.cloud/sysadm/homelab/raw/branch/main/ansible/requirements.txt /tmp/requirements.txt
+ADD https://$GIT_USERNAME:$GIT_PASSWORD@git.sbbh.cloud/sysadm/homelab/raw/branch/main/ansible/requirements.yml /tmp/requirements.yml
 
-# Upgrade pip to latest version.
-RUN pip3 install --upgrade pip
+## install Ansible dependencies
+RUN pip install -r /tmp/requirements.txt
+RUN ansible-galaxy install -r /tmp/requirements.yml --force
 
-# Install Ansible via pip.
-RUN pip3 install $pip_packages
-
-COPY initctl_faker .
-RUN chmod +x initctl_faker && rm -fr /sbin/initctl && ln -s /initctl_faker /sbin/initctl
-
-# Install Ansible inventory file.
+## Install Ansible inventory file.
 RUN mkdir -p /etc/ansible
 RUN echo "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
 
-# Make sure systemd doesn't start agettys on tty[1-6].
-RUN rm -f /lib/systemd/system/multi-user.target.wants/getty.target
-
-VOLUME ["/sys/fs/cgroup"]
-CMD ["/lib/systemd/systemd"]
+COPY entry.sh /entry.sh
+ENTRYPOINT ["/entry.sh"]
+CMD ["/sbin/init"]

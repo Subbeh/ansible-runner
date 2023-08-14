@@ -1,5 +1,4 @@
 ---
-
 kind: pipeline
 type: docker
 name: ansible-runner
@@ -32,7 +31,7 @@ steps:
         - latest
     volumes:
       - name: docker
-        path: /var/lib/docker       
+        path: /var/lib/docker
     when:
       event:
         - push
@@ -52,7 +51,7 @@ steps:
         - latest
     when:
       event:
-      - cron
+        - cron
 
   - name: discord notification
     image: appleboy/drone-discord
@@ -65,10 +64,10 @@ steps:
       message: >
         {{#success build.status}}✅{{else}}⚠️{{/success}}
         repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
-               commit: `{{commit.message}}` 
+               commit: `{{commit.message}}`
     when:
-      status: [ success, failure, changed ]
-      event: [ push ]
+      status: [success, failure, changed]
+      event: [push]
 
 volumes:
   - name: cache
@@ -79,7 +78,6 @@ volumes:
       path: /var/cache/${DRONE_REPO}/docker
 
 ---
-
 kind: secret
 name: GITEA_USER
 get:
@@ -87,7 +85,6 @@ get:
   name: GITEA_USER
 
 ---
-
 kind: secret
 name: GITEA_PASSWORD
 get:
@@ -95,7 +92,6 @@ get:
   name: GITEA_PASSWORD
 
 ---
-
 kind: secret
 name: DISCORD_ID
 get:
@@ -103,7 +99,6 @@ get:
   name: DISCORD_ID
 
 ---
-
 kind: secret
 name: DISCORD_TOKEN
 get:
