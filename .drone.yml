@@ -5,9 +5,9 @@ name: ansible-runner
 
 globals:
   - &docker_creds
-    username:
+    GIT_USERNAME:
       from_secret: GITEA_USER
-    password:
+    GIT_PASSWORD:
       from_secret: GITEA_PASSWORD
 
 steps:
