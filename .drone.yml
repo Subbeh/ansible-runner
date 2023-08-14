@@ -23,10 +23,13 @@ steps:
     image: plugins/docker
     privileged: true
     settings:
+      <<: *docker_creds
       repo: git.sbbh.cloud/sysadm/ansible-runner
       registry: git.sbbh.cloud
       mtu: 1450
-      <<: *docker_creds
+      build_args:
+        - GIT_USERNAME=${username}
+        - GIT_PASSWORD=${password}
       tags:
         - latest
     volumes:
@@ -41,12 +44,15 @@ steps:
     image: plugins/docker
     privileged: true
     settings:
+      <<: *docker_creds
       repo: git.sbbh.cloud/sysadm/ansible-runner
       registry: git.sbbh.cloud
       mtu: 1450
       pull_image: true
       no_cache: true
-      <<: *docker_creds
+      build_args:
+        - GIT_USERNAME=${username}
+        - GIT_PASSWORD=${password}
       tags:
         - latest
     when:
