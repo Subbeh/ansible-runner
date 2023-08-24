@@ -14,10 +14,7 @@ ADD https://$GIT_USER:$GIT_PASSWORD@git.sbbh.cloud/sysadm/homelab/raw/branch/mai
 RUN pip install -r /tmp/requirements.txt
 RUN ansible-galaxy install -r /tmp/requirements.yml --force
 
-## Install Ansible inventory file.
-RUN mkdir -p /etc/ansible
-RUN echo "[local]\nlocalhost ansible_connection=local" > /etc/ansible/hosts
-
+## run entrypoint script
 COPY entry.sh /entry.sh
 ENTRYPOINT ["/entry.sh"]
 CMD ["/sbin/init"]
