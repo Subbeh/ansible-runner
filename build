@@ -7,6 +7,6 @@ docker buildx build \
   --progress=plain \
   --push \
   --no-cache=false \
-  --tag git.sbbh.cloud/sysadm/ansible-runner:alpine \
-  --tag git.sbbh.cloud/sysadm/ansible-runner:latest \
+  --tag git.sbbh.cloud/infra/ansible-runner:alpine \
+  --tag git.sbbh.cloud/infra/ansible-runner:latest \
   .

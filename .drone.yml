@@ -3,6 +3,13 @@ kind: pipeline
 type: docker
 name: ansible-runner
 
+trigger:
+  event:
+    - push
+    - custom
+    - rollback
+    - cron
+
 globals:
   - &docker_creds
     username:
@@ -45,20 +52,31 @@ steps:
         path: /var/lib/docker
     when:
       event:
-        - push
-        - pull_request
+        - custom
 
   - name: build and publish (scheduled)
     image: plugins/docker
     privileged: true
+    environment:
+      GIT_USER:
+        from_secret: GITEA_USER
+      GIT_PASSWORD:
+        from_secret: GITEA_PASSWORD
     settings:
-      # <<: *docker_creds
+      <<: *docker_creds
       repo: git.sbbh.cloud/infra/ansible-runner
       registry: git.sbbh.cloud
+      mtu: 1450
       pull_image: true
       no_cache: true
+      build_args_from_env:
+        - GIT_USER
+        - GIT_PASSWORD
       tags:
         - latest
+    volumes:
+      - name: docker
+        path: /var/lib/docker
     when:
       event:
         - cron
@@ -75,9 +93,6 @@ steps:
         {{#success build.status}}✅{{else}}⚠️{{/success}}
         repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
                commit: `{{commit.message}}`
-    when:
-      status: [success, failure, changed]
-      event: [push]
 
 volumes:
   - name: cache
