@@ -1,5 +1,6 @@
 FROM alpine/ansible:latest
 
+## parse cli arguments
 ARG GIT_USER
 ARG GIT_PASSWORD
 
