@@ -11,7 +11,7 @@ globals:
       from_secret: GITEA_PASSWORD
 
 image_pull_secrets:
-  - DOCKER_CONFIG
+  - DRONE_DOCKER_CONFIG
 
 steps:
   - name: prepare-cache
@@ -88,10 +88,10 @@ volumes:
       path: /var/cache/${DRONE_REPO}/docker
 ---
 kind: secret
-name: DOCKER_CONFIG
+name: DRONE_DOCKER_CONFIG
 get:
   path: doppler-drone
-  name: DOCKER_CONFIG
+  name: DRONE_DOCKER_CONFIG
 ---
 kind: secret
 name: GITEA_USER
