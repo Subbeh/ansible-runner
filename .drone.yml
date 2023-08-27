@@ -4,11 +4,12 @@ type: docker
 name: ansible-runner
 
 trigger:
+  branch:
+    - main
   event:
-    - push
+    - cron
     - custom
     - rollback
-    - cron
 
 globals:
   - &docker_creds
@@ -42,17 +43,16 @@ steps:
       repo: git.sbbh.cloud/infra/ansible-runner
       registry: git.sbbh.cloud
       mtu: 1450
+      auto_tag: true
       build_args_from_env:
         - GIT_USER
         - GIT_PASSWORD
-      tags:
-        - latest
     volumes:
       - name: docker
         path: /var/lib/docker
     when:
-      event:
-        - custom
+      status: [success]
+      event: [custom]
 
   - name: build and publish (scheduled)
     image: plugins/docker
@@ -69,17 +69,16 @@ steps:
       mtu: 1450
       pull_image: true
       no_cache: true
+      auto_tag: true
       build_args_from_env:
         - GIT_USER
         - GIT_PASSWORD
-      tags:
-        - latest
     volumes:
       - name: docker
         path: /var/lib/docker
     when:
-      event:
-        - cron
+      status: [success]
+      event: [cron]
 
   - name: discord notification
     image: appleboy/drone-discord
