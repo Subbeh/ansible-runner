@@ -30,6 +30,26 @@ steps:
       - name: cache
         path: /cache
 
+  # - name: build and publish image
+  #   image: docker:dind
+  #   # command:
+  #   #   - "--dns=10.11.80.1"
+  #   commands:
+  #     - sleep 500000 # give docker enough time to start
+  #     - docker login -u $GIT_USER -p $GIT_PASSWORD git.sbbh.cloud
+  #     - docker build --build-arg GIT_USER=$GIT_USER --build-arg GIT_PASSWORD=$GIT_PASSWORD --tag git.sbbh.cloud/infra/ansible-runner:latest .
+  #     - docker push git.sbbh.cloud/infra/ansible-runner:latest
+  #   environment:
+  #     GIT_USER:
+  #       from_secret: GITEA_USER
+  #     GIT_PASSWORD:
+  #       from_secret: GITEA_PASSWORD
+  #   volumes:
+  #     - name: dockersock
+  #       path: /var/run
+  #     - name: cache
+  #       path: /var/lib/docker
+
   - name: build and publish
     image: plugins/docker
     privileged: true
@@ -54,52 +74,63 @@ steps:
       status: [success]
       event: [custom]
 
-  - name: build and publish (scheduled)
-    image: plugins/docker
-    privileged: true
-    environment:
-      GIT_USER:
-        from_secret: GITEA_USER
-      GIT_PASSWORD:
-        from_secret: GITEA_PASSWORD
-    settings:
-      <<: *docker_creds
-      repo: git.sbbh.cloud/infra/ansible-runner
-      registry: git.sbbh.cloud
-      mtu: 1450
-      pull_image: true
-      no_cache: true
-      auto_tag: true
-      build_args_from_env:
-        - GIT_USER
-        - GIT_PASSWORD
-    volumes:
-      - name: docker
-        path: /var/lib/docker
-    when:
-      status: [success]
-      event: [cron]
+  # - name: build and publish (scheduled)
+  #   image: plugins/docker
+  #   privileged: true
+  #   environment:
+  #     GIT_USER:
+  #       from_secret: GITEA_USER
+  #     GIT_PASSWORD:
+  #       from_secret: GITEA_PASSWORD
+  #   settings:
+  #     <<: *docker_creds
+  #     repo: git.sbbh.cloud/infra/ansible-runner
+  #     registry: git.sbbh.cloud
+  #     mtu: 1450
+  #     pull_image: true
+  #     no_cache: true
+  #     auto_tag: true
+  #     build_args_from_env:
+  #       - GIT_USER
+  #       - GIT_PASSWORD
+  #   volumes:
+  #     - name: docker
+  #       path: /var/lib/docker
+  #   when:
+  #     status: [success]
+  #     event: [cron]
 
-  - name: discord notification
-    image: appleboy/drone-discord
-    settings:
-      username: Drone
-      webhook_id:
-        from_secret: DISCORD_ID
-      webhook_token:
-        from_secret: DISCORD_TOKEN
-      message: >
-        {{#success build.status}}✅{{else}}⚠️{{/success}}
-        repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
-               commit: `{{commit.message}}`
+  # - name: discord notification
+  #   image: appleboy/drone-discord
+  #   settings:
+  #     username: Drone
+  #     webhook_id:
+  #       from_secret: DISCORD_ID
+  #     webhook_token:
+  #       from_secret: DISCORD_TOKEN
+  #     message: >
+  #       {{#success build.status}}✅{{else}}⚠️{{/success}}
+  #       repo: `[{{repo.name}}/{{commit.branch}}]` `[{{uppercase build.event}}]` [[#{{build.number}}]({{build.link}})][[{{truncate commit.sha 5}}]({{commit.link}})]
+  #              commit: `{{commit.message}}`
+
+# services:
+#   - name: docker
+#     image: docker:dind
+#     privileged: true
+#     # command:
+#     #   - "--dns=10.11.80.1"
+#     #   - "--dns-search=example.com"
+#     volumes:
+#       - name: dockersock
+#         path: /var/run
 
 volumes:
+  # - name: dockersock
+  #   temp: {}
   - name: cache
     host:
-      path: /var/cache
-  - name: docker
-    host:
       path: /var/cache/${DRONE_REPO}/docker
+
 ---
 kind: secret
 name: DOCKER_CONFIG
